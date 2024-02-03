@@ -1,6 +1,5 @@
 #include <LCD_I2C.h>
 LCD_I2C lcd(0x27, 16, 2); // Default address 
-int candy = 20;
 int knop;
 int shootings = 0;
 uint8_t CAT1[8] =  //karaters voor ventilator.
@@ -182,10 +181,7 @@ void loop(){
 void shot() {
   shootings ++; 
   //motor...
-  candy --;
    lcd.setCursor(11,0);
    lcd.print(shootings);
-   lcd.setCursor(11,1);
-   lcd.print(candy);
    delay(1000);
 }
