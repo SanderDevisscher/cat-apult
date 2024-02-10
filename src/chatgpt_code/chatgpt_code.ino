@@ -1,23 +1,15 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 
-#define SERVO_PIN_1 9 // Pin voor servo 1 (snoepjes verplaatsen)
-#define SERVO_PIN_2 10 // Pin voor servo 2 (schietmechanisme)
-#define BUTTON_PIN 2 // Pin voor het knopje
-#define RESET_PIN 3 // Pin voor het resetknopje
-#define BUZZER_PIN 4 // Pin voor de buzzer
-#define LCD_RS 12
-#define LCD_EN 11
-#define LCD_D4 5
-#define LCD_D5 4
-#define LCD_D6 3
-#define LCD_D7 6
-#define LCD_COLUMNS 16
-#define LCD_ROWS 2
+#define SERVO_PIN_1 2 // Pin voor servo 1 (snoepjes verplaatsen)
+#define SERVO_PIN_2 3 // Pin voor servo 2 (schietmechanisme)
+#define BUTTON_PIN 4 // Pin voor het knopje
+#define RESET_PIN 5 // Pin voor het resetknopje
+#define BUZZER_PIN 6 // Pin voor de buzzer
 
 Servo servo1;
 Servo servo2;
-LiquidCrystal lcd(LCD_RS, LCD_EN, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
 const unsigned long cooldownTime = 300000; // 5 minuten cooldown tijd
 unsigned long lastPressTime = 0;
@@ -29,7 +21,7 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(RESET_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
-  lcd.begin(LCD_COLUMNS, LCD_ROWS);
+  lcd.begin(16, 2);
   lcd.print("Shootings: ");
 }
 
