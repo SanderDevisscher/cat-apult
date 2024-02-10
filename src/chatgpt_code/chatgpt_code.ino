@@ -11,8 +11,9 @@ Servo servo1;
 Servo servo2;
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-const unsigned long cooldownTime = 300000; // 5 minuten cooldown tijd
+const unsigned long cooldownTime = 3000; // 5 minuten cooldown tijd
 unsigned long lastPressTime = 0;
+bool firstSweetsDeparted = false;
 int shootings = 0;
 
 void setup() {
@@ -27,10 +28,11 @@ void setup() {
 
 void loop() {
   unsigned long currentTime = millis();
-  
+
   if (digitalRead(BUTTON_PIN) == LOW && currentTime - lastPressTime >= cooldownTime) {
     lastPressTime = currentTime;
     moveSweets();
+    firstSweetsDeparted = true;
     shootSweets();
     updateLCD();
   }
@@ -41,13 +43,16 @@ void loop() {
     lcd.print("             "); // Om het oude aantal te overschrijven
     lcd.setCursor(0, 1);
     lcd.print(shootings);
+    firstSweetsDeparted = false; // Reset de flag
   }
-  
-  if (currentTime - lastPressTime < cooldownTime && digitalRead(BUTTON_PIN) == LOW) {
-    digitalWrite(BUZZER_PIN, HIGH);
-    delay(100);
-    digitalWrite(BUZZER_PIN, LOW);
-    delay(100);
+
+  if (firstSweetsDeparted && currentTime - lastPressTime >= cooldownTime) {
+    if (digitalRead(BUTTON_PIN) == LOW) {
+      digitalWrite(BUZZER_PIN, HIGH);
+      delay(100);
+      digitalWrite(BUZZER_PIN, LOW);
+      delay(100);
+    }
   }
 
   // Cooldown tijd weergeven op LCD scherm
