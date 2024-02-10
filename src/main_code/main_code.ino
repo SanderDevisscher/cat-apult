@@ -1,9 +1,12 @@
 #include <LiquidCrystal.h>
+#include <Servo.h>
 int ledPin = 3;
-int knop;
+int knop = 4;
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
 int shootings = 0;
 unsigned long startTime;
+int servo1_pin = 2;
+Servo servo1;
 
 // cat parts:
 uint8_t CAT1[8] =  //karaters voor ventilator.
@@ -108,11 +111,13 @@ uint8_t OP[8] =  //karaters voor ventilator.
 };
 
 void setup() {
+  Serial.begin(9600);
   // put your setup code here, to run once:
  pinMode(ledPin, OUTPUT);
  pinMode(2, INPUT_PULLUP);
  lcd.begin(16, 2); 
  lcd.setCursor(0,0); 
+ servo1.attach(servo1_pin);
 
  lcd.createChar(9, CAT1);  //karaters
     lcd.createChar(1, CAT2);  //karaters
@@ -161,7 +166,6 @@ void setup() {
     lcd.print("Shootings:      ");
     lcd.setCursor(11,0);
     lcd.print(shootings);
-
     startTime = millis();
 }
 
@@ -179,10 +183,13 @@ void loop() {
 void shot() {
   
   //motor...
-  
-   if(shootings >= 2){
+  Serial.println(knop);
+   if(shootings >= 1){
      unsigned long currentTime = millis();
+    // bereken cooldown
+   
 
+    // knop werd te snel ingedrukt
      if (currentTime - startTime < 120000) {
       lcd.setCursor(0,1);
       lcd.print("neeje niet nu!!");  // Reset the count if 2 seconds have passed
@@ -191,7 +198,11 @@ void shot() {
       lcd.print("               ");
       startTime = currentTime;
      }
+    // er werd lang genoeg gewacht
      else{
+      servo1.write(0);
+      delay(500);
+      servo1.write(180);
       shootings ++; 
       lcd.setCursor(11,0);
       lcd.print(shootings);
@@ -200,9 +211,16 @@ void shot() {
      }
    }
    else{
-    shootings ++; 
+     servo1.write(0);
+     delay(500);
+     servo1.write(180);
+     shootings ++; 
      lcd.setCursor(11,0);
      lcd.print(shootings);
     delay(500);
    }
+}
+
+void cooldown(){
+
 }
