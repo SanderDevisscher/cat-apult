@@ -1,88 +1,65 @@
 #include <Servo.h>
 #include <LiquidCrystal.h>
 
-#define SERVO_PIN_1 2 // Pin voor servo 1 (snoepjes verplaatsen)
-#define SERVO_PIN_2 3 // Pin voor servo 2 (schietmechanisme)
-#define BUTTON_PIN 4 // Pin voor het knopje
-#define RESET_PIN 5 // Pin voor het resetknopje
-#define BUZZER_PIN 6 // Pin voor de buzzer
+Servo feederServo;  // servo voor het voeren van snoepjes
+Servo shooterServo; // servo voor het schieten van snoepjes
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7); // LCD pinnen
 
-Servo servo1;
-Servo servo2;
-LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+const int startButtonPin = 2;  // pin voor start knop
+const int resetButtonPin = 3;  // pin voor reset knop
+const int buzzerPin = 1;       // pin voor buzzer
 
-const unsigned long cooldownTime = 3000; // 5 minuten cooldown tijd
-unsigned long lastPressTime = 0;
-bool firstSweetsDeparted = false;
-int shootings = 0;
+int shootings = 0;             // aantal shootings
+unsigned long cooldownTime = 60000; // cooldown tijd in milliseconden (1 minuut)
+unsigned long lastShootTime = 0;    // tijd van laatste shooting
 
 void setup() {
-  servo1.attach(SERVO_PIN_1);
-  servo2.attach(SERVO_PIN_2);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  pinMode(RESET_PIN, INPUT_PULLUP);
-  pinMode(BUZZER_PIN, OUTPUT);
+  feederServo.attach(11);
+  shooterServo.attach(12);
+  pinMode(startButtonPin, INPUT_PULLUP);
+  pinMode(resetButtonPin, INPUT_PULLUP);
+  pinMode(buzzerPin, OUTPUT);
   lcd.begin(16, 2);
-  lcd.print("Shootings: ");
+  lcd.print("aantal shootings:");
+  lcd.setCursor(0, 1);
+  lcd.print("cooldowntime:");
 }
 
 void loop() {
-  unsigned long currentTime = millis();
-
-  if (digitalRead(BUTTON_PIN) == LOW && currentTime - lastPressTime >= cooldownTime) {
-    lastPressTime = currentTime;
-    moveSweets();
-    firstSweetsDeparted = true;
-    shootSweets();
-    updateLCD();
+  if (digitalRead(startButtonPin) == LOW) {
+    lcd.clear();
+    lcd.print("Nee niet nu!");
+    delay(60000); // wacht 1 minuut
+    lcd.clear();
+    lcd.print("aantal shootings:");
+    lcd.setCursor(0, 1);
+    lcd.print("cooldowntime:");
   }
 
-  if (digitalRead(RESET_PIN) == LOW) {
+  if (digitalRead(resetButtonPin) == LOW) {
     shootings = 0;
-    lcd.setCursor(0, 1);
-    lcd.print("             "); // Om het oude aantal te overschrijven
-    lcd.setCursor(0, 1);
-    lcd.print(shootings);
-    firstSweetsDeparted = false; // Reset de flag
+    lastShootTime = 0;
   }
 
-  if (firstSweetsDeparted && currentTime - lastPressTime >= cooldownTime) {
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      digitalWrite(BUZZER_PIN, HIGH);
-      delay(100);
-      digitalWrite(BUZZER_PIN, LOW);
-      delay(100);
+  unsigned long currentTime = millis();
+  if (currentTime - lastShootTime >= cooldownTime) {
+    if (shootings > 0) {
+      shootings--;
     }
+    lastShootTime = currentTime;
   }
 
-  // Cooldown tijd weergeven op LCD scherm
-  unsigned long remainingTime = cooldownTime - (currentTime - lastPressTime);
-  lcd.setCursor(0, 0);
-  lcd.print("Cooldown: ");
-  lcd.print(remainingTime / 60000); // Minuten
-  lcd.print("m ");
-  lcd.print((remainingTime % 60000) / 1000); // Seconden
-  lcd.print("s ");
-}
-
-void moveSweets() {
-  servo1.write(90);
-  delay(1000);
-  servo1.write(0);
-  delay(1000);
-}
-
-void shootSweets() {
-  servo2.write(180);
-  delay(1000);
-  servo2.write(0);
-  delay(1000);
-  shootings++;
-}
-
-void updateLCD() {
-  lcd.setCursor(0, 1);
-  lcd.print("             ");
-  lcd.setCursor(0, 1);
+  lcd.setCursor(16, 0);
   lcd.print(shootings);
+  lcd.setCursor(14, 1);
+  lcd.print(cooldownTime / 1000); // toon cooldown tijd in seconden
+
+  // Voer hier de code in voor het schieten van snoepjes wanneer nodig
+}
+
+void buzz() {
+  digitalWrite(buzzerPin, HIGH);
+  delay(100);
+  digitalWrite(buzzerPin, LOW);
+  delay(100);
 }
