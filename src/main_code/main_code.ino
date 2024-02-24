@@ -1,6 +1,7 @@
 #include <LiquidCrystal.h>
 #include <Servo.h>
 int knop;
+int buzzer;
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
 int shootings = 0;
 unsigned long startTime;
@@ -114,6 +115,7 @@ void setup() {
  Serial.begin(9600);
   // put your setup code here, to run once:
  pinMode(3, INPUT_PULLUP);
+ pinMode(11, OUTPUT);
  lcd.begin(16, 2); 
  lcd.setCursor(0,0); 
  servo1.attach(servo1_pin);
@@ -206,7 +208,9 @@ void shot() {
       // knop werd te snel ingedrukt
       lcd.setCursor(0,1);
       lcd.print("neeje niet nu!!!");  // Reset the count if 2 seconds have passed
+      digitalWrite(11, HIGH);
       delay(500);
+      digitalWrite(11, LOW);
       lcd.setCursor(0,1);
       lcd.print("               ");
      }
