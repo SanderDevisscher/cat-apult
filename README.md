@@ -13,3 +13,4 @@
  - pin 5 = digital 11
  - pin 6 = digital 12
  - pin 7 = digital 13
+https://www.youtube.com/watch?v=1R21wWn0c1s&t=318s
