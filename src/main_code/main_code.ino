@@ -114,8 +114,8 @@ uint8_t OP[8] =  //karaters voor ventilator.
 void setup() {
  Serial.begin(9600);
   // put your setup code here, to run once:
- pinMode(3, INPUT_PULLUP);
- pinMode(11, OUTPUT);
+ pinMode(11, INPUT_PULLUP);
+ pinMode(3, OUTPUT);
  lcd.begin(16, 2); 
  lcd.setCursor(0,0); 
  servo1.attach(servo1_pin);
@@ -173,7 +173,7 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-    knop = digitalRead(3);
+    knop = digitalRead(11);
     
     Serial.println(knop);
     
@@ -208,9 +208,9 @@ void shot() {
       // knop werd te snel ingedrukt
       lcd.setCursor(0,1);
       lcd.print("neeje niet nu!!!");  // Reset the count if 2 seconds have passed
-      digitalWrite(11, HIGH);
+      digitalWrite(3, HIGH);
       delay(500);
-      digitalWrite(11, LOW);
+      digitalWrite(3, LOW);
       lcd.setCursor(0,1);
       lcd.print("               ");
      }
