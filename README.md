@@ -5,7 +5,7 @@
 - [lcd-module-display-2x16 - manual](https://media.digikey.com/pdf/Data%20Sheets/DFRobot%20PDFs/DFR0009_Web.pdf)
 
 
-![image](https://github.com/SanderDevisscher/cat-apult/assets/158763154/e9bb6e67-a6be-4815-8767-5a062e3ebd42)
+![image](https://github.com/SanderDevisscher/cat-apult/assets/158763154/b3015066-4db2-4914-a28f-fa5abe617e78)
 
 ### PINS LCD Scherm:
  - pin 3 = digital 2
