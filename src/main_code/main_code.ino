@@ -1,12 +1,12 @@
 #include <LiquidCrystal.h>
 #include <Servo.h>
-int ledPin = 3;
-int knop = 4;
+int knop;
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7); 
 int shootings = 0;
 unsigned long startTime;
 int servo1_pin = 2;
 Servo servo1;
+unsigned long cooldownTime = 60000; // cooldown tijd in milliseconden (1 minuut)
 
 // cat parts:
 uint8_t CAT1[8] =  //karaters voor ventilator.
@@ -111,15 +111,14 @@ uint8_t OP[8] =  //karaters voor ventilator.
 };
 
 void setup() {
-  Serial.begin(9600);
+ Serial.begin(9600);
   // put your setup code here, to run once:
- pinMode(ledPin, OUTPUT);
- pinMode(2, INPUT_PULLUP);
+ pinMode(3, INPUT_PULLUP);
  lcd.begin(16, 2); 
  lcd.setCursor(0,0); 
  servo1.attach(servo1_pin);
 
- lcd.createChar(9, CAT1);  //karaters
+    lcd.createChar(9, CAT1);  //karaters
     lcd.createChar(1, CAT2);  //karaters
     lcd.createChar(2, CAT3);  //karaters
     lcd.createChar(3, CAT4);  //karaters
@@ -172,55 +171,65 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-   knop = digitalRead(2);
+    knop = digitalRead(3);
     
     Serial.println(knop);
+    
     if(knop == 0) {
       shot();
     }
+  
+  unsigned long currentTime = millis();
+  unsigned long remainingTime = cooldownTime - (currentTime - startTime);
+  if(remainingTime < cooldownTime && shootings > 0){
+    lcd.setCursor(0, 1);
+    lcd.print("Cooldown: ");
+    lcd.print(remainingTime / 60000); // Minuten
+    lcd.print("m ");
+    lcd.print((remainingTime % 60000) / 1000); // Seconden
+    lcd.print("s ");
+  }else{
+    lcd.setCursor(0, 1);
+    lcd.print("ready to trigger");
+  }
+  
 }
 
 void shot() {
   
   //motor...
-  Serial.println(knop);
    if(shootings >= 1){
      unsigned long currentTime = millis();
-    // bereken cooldown
-   
 
-    // knop werd te snel ingedrukt
-     if (currentTime - startTime < 120000) {
+    
+     if (currentTime - startTime < cooldownTime) {
+      // knop werd te snel ingedrukt
       lcd.setCursor(0,1);
-      lcd.print("neeje niet nu!!");  // Reset the count if 2 seconds have passed
+      lcd.print("neeje niet nu!!!");  // Reset the count if 2 seconds have passed
       delay(500);
       lcd.setCursor(0,1);
       lcd.print("               ");
-      startTime = currentTime;
      }
-    // er werd lang genoeg gewacht
+    
      else{
+      // er werd lang genoeg gewacht
       servo1.write(0);
       delay(500);
       servo1.write(180);
       shootings ++; 
       lcd.setCursor(11,0);
       lcd.print(shootings);
-      delay(500);
-      startTime = currentTime;
+      startTime = millis();
      }
    }
    else{
+    //eerste keer op knop gedrukt
      servo1.write(0);
      delay(500);
      servo1.write(180);
      shootings ++; 
      lcd.setCursor(11,0);
      lcd.print(shootings);
-    delay(500);
+     startTime = millis();
    }
-}
-
-void cooldown(){
-
 }
